@@ -1,3 +1,4 @@
 # Theano-SimpleNN
 
-Simple NN built in Theano
+Simple NN with 2 input nodes and binary output (built using Theano)
+
