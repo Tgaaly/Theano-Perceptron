@@ -21,10 +21,8 @@ def sgd(cost, params, lr=0.05):
 # our model in matrix form
 def model(X1, X2, w_h, w_o):
 	X12 = T.concatenate([X1,X2],axis=0)
-	d1 = T.dot(T.transpose(X12), w_h)
-	h = T.nnet.sigmoid(d1)
-	d2 = T.dot(h, w_o)
-	a = T.nnet.softmax(d2)
+	h = T.nnet.sigmoid(T.dot(T.transpose(X12), w_h))
+	a = T.nnet.softmax(T.dot(h, w_o))
 	return a
 
 # matrix types
