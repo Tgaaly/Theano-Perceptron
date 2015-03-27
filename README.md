@@ -1,2 +1,3 @@
-# Theano-Perceptron
-Perceptron built in Theano
+# Theano-SimpleNN
+
+Simple NN built in Theano
