@@ -10,6 +10,9 @@ def floatX(X):
 def init_weight(shape):
 	return theano.shared(floatX(np.random.randn(*shape) * 0.01))
 
+def init_bias(dim):
+        return theano.shared(np.zeros(dim,))
+
 def sgd(cost, params, lr=0.05):
 	grads = T.grad(cost=cost, wrt=params)
 	updates=[]
@@ -19,9 +22,9 @@ def sgd(cost, params, lr=0.05):
 
 
 # our model in matrix form
-def model(X1, X2, w_h, w_o):
+def model(X1, X2, w_h, w_o, b):
 	X12 = T.concatenate([X1,X2],axis=0)
-	h = T.nnet.sigmoid(T.dot(T.transpose(X12), w_h))
+	h = T.nnet.sigmoid(T.dot(T.transpose(X12), w_h) + b)#T.tile(b, (20, 1)))
 	a = T.nnet.softmax(T.dot(h, w_o))
 	return a
 
@@ -33,14 +36,15 @@ Y = T.fmatrix()
 sz_input = 300 # for 100 x 3 points
 w_h = init_weight((sz_input*2, 300))
 w_o = init_weight((300, 2))
+b   = init_bias((300))
 
-a = model(X1,X2,w_h,w_o)
+a = model(X1,X2,w_h,w_o,b)
 # probability output and maxima predictions
 y = T.argmax(a,axis=1)
 
 # classification metric to optimize
 cost = T.mean(T.nnet.categorical_crossentropy(a, Y))
-params = [w_h, w_o]
+params = [w_h, w_o, b]
 updates = sgd(cost, params)
 
 train = theano.function(inputs=[X1,X2,Y], outputs=cost, updates=updates, allow_input_downcast=True)
@@ -67,7 +71,6 @@ for i in range(0,200):
 
 
 sz_batch = 20
-cost = T.scalar()
 for i in range(0,50):
 	for start, end in zip(range(0,len(trX1), sz_batch) , range(sz_batch, len(trX2), sz_batch)):
 		cost=train(trX1[:,start:end], trX2[:,start:end], y[start:end,:])
